@@ -1,0 +1,25 @@
+{
+  "name": "smart-review-agent",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI-powered Google review drafting assistant for four businesses (Next.js + Supabase + Gemini)",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start -p ${PORT:-3000}",
+    "test:e2e": "node scripts/e2e-test.mjs",
+    "test:keywords": "node scripts/keyword-test.mjs",
+    "mock:gemini": "node scripts/mock-gemini.mjs"
+  },
+  "engines": {
+    "node": ">=20.9"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.119.0",
+    "next": "16.4.6",
+    "qrcode": "1.5.4",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "server-only": "^0.0.1"
+  }
+}
