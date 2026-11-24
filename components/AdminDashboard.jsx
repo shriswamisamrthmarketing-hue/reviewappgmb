@@ -115,6 +115,15 @@ export default function AdminDashboard() {
         {!adding && <button className="btn primary small" onClick={() => setAdding(true)}>+ Add business</button>}
       </div>
       {notice && <div className="alert info">{notice}</div>}
+      {businesses.some((b) => !b.google_review_url) && (
+        <div className="alert warn">
+          <b>No Google review link: </b>
+          {businesses.filter((b) => !b.google_review_url).map((b, i) => (
+            <span key={b.slug}>{i ? ', ' : ''}<Link href={`/admin/${b.slug}`}>{b.short_name || b.name}</Link> (/review/{b.slug})</span>
+          ))}
+          . Customers who scan these QR codes cannot open Google until a link is added (Edit → Google review link).
+        </div>
+      )}
       {adding && (
         <AddBusinessForm
           onCancel={() => setAdding(false)}

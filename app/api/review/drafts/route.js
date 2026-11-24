@@ -29,6 +29,9 @@ export async function POST(req) {
   }
   const preview = Boolean(body.preview) && ((await isAdmin()) || (await getOwnerSession())?.slug === business.slug);
   const manual = body.mode === 'manual';
+  // record: save the customer's chosen rating without writing suggestions (a safety net when the
+  //   customer acts before the request for their star tap has finished).
+  const record = body.mode === 'record';
 
   // Existing record (same customer asking for new wording / another style)?
   let fb = null;
@@ -42,6 +45,8 @@ export async function POST(req) {
   const previous = Array.isArray(body.previous) ? body.previous.slice(-35).map((d) => String(d).slice(0, 600)) : [];
   const result = manual
     ? { drafts: [], source: 'manual', aiUnavailable: null }
+    : record
+    ? { drafts: [], source: ['ai', 'fallback'].includes(body.draftsSource) ? body.draftsSource : 'fallback', aiUnavailable: null }
     : await generateDrafts(business, f, { previous, seed: Number(body.seed) || 0, count: cleanSettings(business.settings).suggestions });
 
   if (!preview) {

@@ -31,6 +31,18 @@ const T = {
     hi: 'अपनी रेटिंग पर टैप करें, फिर नीचे किसी भी रिव्यू पर टैप करें – कॉपी होकर Google खुलेगा',
     mr: 'तुमच्या रेटिंगवर टॅप करा, मग खालील कोणत्याही रिव्ह्यूवर टॅप करा – कॉपी होऊन Google उघडेल',
   },
+  topSubGo: {
+    en: 'Tap below to write your review on Google. You choose your stars there.',
+    hi: 'Google पर अपना रिव्यू लिखने के लिए नीचे टैप करें. स्टार आप वहीं चुनते हैं.',
+    mr: 'Google वर तुमचा रिव्ह्यू लिहिण्यासाठी खाली टॅप करा. स्टार्स तुम्ही तिथेच निवडता.',
+  },
+  writeGoogle: { en: '⭐ Write a Google Review', hi: '⭐ Google रिव्यू लिखें', mr: '⭐ Google रिव्ह्यू लिहा' },
+  helpQ: { en: 'Need help with the words? (optional)', hi: 'शब्दों में मदद चाहिए? (वैकल्पिक)', mr: 'शब्दांसाठी मदत हवी आहे? (ऐच्छिक)' },
+  helpHint: {
+    en: 'Tap a rating to see review ideas you can copy. Every honest rating is welcome.',
+    hi: 'कॉपी करने लायक रिव्यू आइडिया देखने के लिए रेटिंग पर टैप करें. हर सच्ची रेटिंग का स्वागत है.',
+    mr: 'कॉपी करता येतील अशा रिव्ह्यू कल्पना पाहण्यासाठी रेटिंगवर टॅप करा. प्रत्येक प्रामाणिक रेटिंगचं स्वागत आहे.',
+  },
   topSubNoLink: { en: 'Tap your rating, then pick a review to copy', hi: 'अपनी रेटिंग पर टैप करें, फिर कॉपी करने के लिए रिव्यू चुनें', mr: 'तुमच्या रेटिंगवर टॅप करा, मग कॉपी करण्यासाठी रिव्ह्यू निवडा' },
   ownTitle: { en: '✍️ Add your own experience (optional)', hi: '✍️ अपना अनुभव जोड़ें (वैकल्पिक)', mr: '✍️ तुमचा अनुभव जोडा (ऐच्छिक)' },
   ownPh2: {
@@ -126,6 +138,11 @@ const T = {
     hi: '{n} के साथ अपना सच्चा फीडबैक साझा करने के लिए धन्यवाद. ज़रूरत हो तो रिव्यू फिर से पेस्ट कर सकते हैं.',
     mr: '{n} सोबत तुमचा प्रामाणिक अभिप्राय शेअर केल्याबद्दल धन्यवाद. गरज असल्यास रिव्ह्यू पुन्हा पेस्ट करू शकता.',
   },
+  doneTextGo: {
+    en: 'Google is open in a new tab. Choose your stars there and write your review in your own words. Thank you, {n} values your feedback.',
+    hi: 'Google नई टैब में खुल गया है. वहाँ अपने स्टार चुनें और अपने शब्दों में रिव्यू लिखें. धन्यवाद, {n} आपके फीडबैक की कद्र करता है.',
+    mr: 'Google नवीन टॅबमध्ये उघडलं आहे. तिथे तुमचे स्टार्स निवडा आणि तुमच्या शब्दांत रिव्ह्यू लिहा. धन्यवाद, {n} तुमच्या अभिप्रायाची कदर करतं.',
+  },
   openAgain: { en: 'Open Google again', hi: 'Google फिर से खोलें', mr: 'Google पुन्हा उघडा' },
   footNote: { en: 'You choose your stars and post it yourself on Google', hi: 'स्टार आप चुनते हैं और Google पर खुद पोस्ट करते हैं', mr: 'स्टार्स तुम्ही निवडता आणि Google वर स्वतः पोस्ट करता' },
   privacy: {
@@ -182,6 +199,14 @@ function Star({ on, delay, onClick, label, big }) {
   );
 }
 
+// Google's short review link "g.page/r/<id>" opens the business profile; "g.page/r/<id>/review" opens
+// the write-a-review box directly. The saved link is never changed; only the address customers open.
+function writeReviewUrl(u) {
+  const url = String(u || '').trim();
+  const m = url.match(/^(https:\/\/g\.page\/r\/[A-Za-z0-9_-]+)\/?$/);
+  return m ? `${m[1]}/review` : url;
+}
+
 export default function ReviewFunnel({ business, preview = false, source = 'link', campaign = null, customerUrl = null }) {
   const name = business.short_name || business.name;
   const [lang, setLang] = useState('en');
@@ -204,6 +229,7 @@ export default function ReviewFunnel({ business, preview = false, source = 'link
   const [error, setError] = useState('');
   const [toast, setToast] = useState('');
   const topRef = useRef(null);
+  const googleUrl = writeReviewUrl(business.google_review_url);
 
   const count = business.settings?.suggestions || 3; // set by the admin (3 / 5 / 7)
 
@@ -301,15 +327,34 @@ export default function ReviewFunnel({ business, preview = false, source = 'link
     await fetchDrafts();
   };
 
-  const save = (action, reviewText = text) =>
-    fb
-      ? fetch('/api/review/feedback', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: fb.id, token: fb.token, action, review_text: reviewText, manual }),
-          keepalive: true,
-        }).catch(() => {})
-      : Promise.resolve();
+  // Normally the rating record is created when the customer taps a star. If they copy or open Google
+  // before that request has finished, the record is created here first, then the action saved.
+  const ensureFeedback = async () => {
+    if (fb || preview || !stars) return fb;
+    try {
+      const res = await fetch('/api/review/drafts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: business.slug, mode: 'record', stars, answers: {}, details, language: reviewLang, style: 'friendly', keyword, noKeyword: noKw, source, campaign, draftsSource: meta.source }),
+        keepalive: true,
+      });
+      const j = await res.json();
+      if (j.feedback) setFb(j.feedback);
+      return j.feedback || null;
+    } catch {
+      return null;
+    }
+  };
+  const save = async (action, reviewText = text) => {
+    const f = await ensureFeedback();
+    if (!f) return;
+    await fetch('/api/review/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: f.id, token: f.token, action, review_text: reviewText, manual }),
+      keepalive: true,
+    }).catch(() => {});
+  };
 
   const onCopy = async () => {
     if (await copyText(text)) {
@@ -339,6 +384,12 @@ export default function ReviewFunnel({ business, preview = false, source = 'link
       setStep('post');
     }
   };
+  // "Write a Google Review" (top of the page): opens this business's Google write-review form directly.
+  // The customer picks the stars and writes the review on Google; nothing is rated or copied here.
+  const onWriteGoogle = () => {
+    onDirectGoogle();
+    setTimeout(() => setStep('done'), 400);
+  };
   const onEditFirst = (d) => {
     setManual(false);
     setText(d);
@@ -351,7 +402,7 @@ export default function ReviewFunnel({ business, preview = false, source = 'link
     const has = text.trim().split(/\s+/).filter(Boolean).length >= 3;
     if (has) copyText(text);
     if (preview) return;
-    if (fb && has) save('google');
+    if (has) save('google');
     else
       fetch('/api/event', {
         method: 'POST',
@@ -361,7 +412,7 @@ export default function ReviewFunnel({ business, preview = false, source = 'link
       }).catch(() => {});
   };
   // Bottom buttons: only those the business configured (no broken links), never next to the big Google button.
-  const showDirectGoogle = !!business.google_review_url && step !== 'post' && step !== 'done';
+  const showDirectGoogle = !!business.google_review_url && step !== 'rate' && step !== 'post' && step !== 'done'; // on 'rate' the top button is used
 
   const words = text.trim() ? text.trim().split(/\s+/).length : 0;
   const stepIndex = { rate: 0, edit: 1, post: 2, done: 3 }[step]; // Review → Edit → Post
@@ -406,9 +457,12 @@ export default function ReviewFunnel({ business, preview = false, source = 'link
             {step === 'rate' && (
               <div className="rf-one">
                 <h1 className="rf-ref-title">{name}</h1>
-                <p className="rf-ref-sub">{t(business.google_review_url ? 'topSub' : 'topSubNoLink', lang)}</p>
+                <p className="rf-ref-sub">{t(googleUrl ? 'topSubGo' : 'topSubNoLink', lang)}</p>
+                {googleUrl && (
+                  <a className="rf-btn rf-google rf-write" href={googleUrl} target="_blank" rel="noopener noreferrer" onClick={onWriteGoogle}>{t('writeGoogle', lang)}</a>
+                )}
                 <div className="rf-ref-rate">
-                  <p className="rf-ref-q">{t('rateQ', lang, { n: name })}</p>
+                  <p className="rf-ref-q">{googleUrl ? t('helpQ', lang) : t('rateQ', lang, { n: name })}</p>
                   <div className="rf-stars" onMouseLeave={() => setHover(0)} key={burst}>
                     {[1, 2, 3, 4, 5].map((n) => (
                       <span key={n} onMouseEnter={() => setHover(n)}>
@@ -416,7 +470,7 @@ export default function ReviewFunnel({ business, preview = false, source = 'link
                       </span>
                     ))}
                   </div>
-                  <p className={'rf-star-label show' + (shown ? '' : ' rf-star-hint')}>{shown ? T.starLabels[lang][shown - 1] : t('rateHint', lang)}</p>
+                  <p className={'rf-star-label show' + (shown ? '' : ' rf-star-hint')}>{shown ? T.starLabels[lang][shown - 1] : t(googleUrl ? 'helpHint' : 'rateHint', lang)}</p>
                 </div>
 
                 {stars > 0 && (
@@ -455,7 +509,7 @@ export default function ReviewFunnel({ business, preview = false, source = 'link
                             return (
                               <div key={d} className="rf-scard">
                                 {business.google_review_url ? (
-                                  <a className="rf-scard-main" href={business.google_review_url} target="_blank" rel="noopener noreferrer" onClick={() => onPickSuggestion(d)}>{inner}</a>
+                                  <a className="rf-scard-main" href={googleUrl} target="_blank" rel="noopener noreferrer" onClick={() => onPickSuggestion(d)}>{inner}</a>
                                 ) : (
                                   <button type="button" className="rf-scard-main" onClick={() => onPickSuggestion(d)}>{inner}</button>
                                 )}
@@ -533,7 +587,7 @@ export default function ReviewFunnel({ business, preview = false, source = 'link
                 <ol className="rf-steps">{T.postSteps[lang].map((s) => <li key={s}>{s}</li>)}</ol>
                 <blockquote className="rf-quote">{text}</blockquote>
                 {business.google_review_url ? (
-                  <a className="rf-btn rf-google" href={business.google_review_url} target="_blank" rel="noopener noreferrer" onClick={onGoogle}>
+                  <a className="rf-btn rf-google" href={googleUrl} target="_blank" rel="noopener noreferrer" onClick={onGoogle}>
                     <span aria-hidden="true">⭐</span>
                     {t('openGoogle', lang)}
                   </a>
@@ -552,33 +606,29 @@ export default function ReviewFunnel({ business, preview = false, source = 'link
               <div className="rf-done">
                 <div className="rf-check" aria-hidden="true">✓</div>
                 <h2>{t('doneTitle', lang)}</h2>
-                <p className="rf-sub">{t('doneText', lang, { n: name })}</p>
+                <p className="rf-sub">{t(text.trim() ? 'doneText' : 'doneTextGo', lang, { n: name })}</p>
                 {business.google_review_url && (
-                  <a className="rf-btn rf-ghost" href={business.google_review_url} target="_blank" rel="noopener noreferrer" onClick={() => copyText(text)}>{t('openAgain', lang)}</a>
+                  <a className="rf-btn rf-ghost" href={googleUrl} target="_blank" rel="noopener noreferrer" onClick={() => copyText(text)}>{t('openAgain', lang)}</a>
                 )}
                 <button type="button" className="rf-link" onClick={() => window.location.reload()}>↺ {tr(BASE_T.startOver, lang)}</button>
               </div>
             )}
           </section>
 
-          {/* big buttons – always all three. A button whose link is not saved for THIS business is shown
-              greyed out ("Not set up yet") and does nothing, so a customer never lands on a wrong page.
+          {/* big buttons – Instagram / WhatsApp come from THIS business's own settings
+              (businesses.settings) and are hidden when not saved, so a customer never sees a dead button.
               On the Post / Done steps the main Google button above replaces "Direct Google Review". */}
           <nav className="rf-social" aria-label="Links">
             {showDirectGoogle ? (
-              <a className="rf-sbtn rf-s-google" href={business.google_review_url} target="_blank" rel="noopener noreferrer" onClick={onDirectGoogle}>{t('googleDirect', lang)}</a>
+              <a className="rf-sbtn rf-s-google" href={googleUrl} target="_blank" rel="noopener noreferrer" onClick={onDirectGoogle}>{t('googleDirect', lang)}</a>
             ) : !business.google_review_url && (
               <span className="rf-sbtn rf-s-google rf-sbtn-off" aria-disabled="true">{t('googleDirect', lang)}<small>{t('notSetUp', lang)}</small></span>
             )}
-            {business.instagram_url ? (
+            {business.instagram_url && (
               <a className="rf-sbtn rf-s-ig" href={business.instagram_url} target="_blank" rel="noopener noreferrer">{t('instagram', lang)}</a>
-            ) : (
-              <span className="rf-sbtn rf-s-ig rf-sbtn-off" aria-disabled="true">{t('instagram', lang)}<small>{t('notSetUp', lang)}</small></span>
             )}
-            {business.whatsapp_url ? (
+            {business.whatsapp_url && (
               <a className="rf-sbtn rf-s-wa" href={business.whatsapp_url} target="_blank" rel="noopener noreferrer">{t('whatsapp', lang)}</a>
-            ) : (
-              <span className="rf-sbtn rf-s-wa rf-sbtn-off" aria-disabled="true">{t('whatsapp', lang)}<small>{t('notSetUp', lang)}</small></span>
             )}
           </nav>
 
