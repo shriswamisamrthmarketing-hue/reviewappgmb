@@ -536,24 +536,8 @@ export default function ReviewFunnel({ business, preview = false, source = 'link
                           <button key={c} type="button" className={reviewLang === c ? 'on' : ''} disabled={busy} onClick={() => { if (c === reviewLang) return; setReviewLang(c); fetchDrafts({ overrides: { language: c } }); }}>{l}</button>
                         ))}
                       </div>
-                      {meta.keywordSuggestions?.length > 0 && (
-                        <div className="rf-kw">
-                          <p className="rf-q-title">{t('kwTitle', lang)}</p>
-                          <div className="rf-chips">
-                            <button type="button" className={'rf-chip sm' + (!keyword && !noKw ? ' on' : '')} disabled={busy} onClick={() => chooseKeyword(null)}>
-                              {!keyword && !noKw ? '✓ ' : ''}{t('kwMix', lang)}
-                            </button>
-                            {meta.keywordSuggestions.map((k) => (
-                              <button key={k} type="button" className={'rf-chip sm' + (keyword === k ? ' on' : '')} disabled={busy} onClick={() => chooseKeyword(k)}>
-                                {keyword === k ? '✓ ' : ''}{k}
-                              </button>
-                            ))}
-                            <button type="button" className={'rf-chip sm' + (noKw ? ' on' : '')} disabled={busy} onClick={() => chooseKeyword(null, true)}>
-                              {noKw ? '✓ ' : ''}{t('kwNone', lang)}
-                            </button>
-                          </div>
-                        </div>
-                      )}
+                      {/* Search-phrase chips removed (they confused customers). Every card automatically uses a
+                          different saved SEO keyword ("A different one per review"); nothing to pick. */}
                       <p className="rf-sub rf-sugg-note">{t('draftsNote', lang)}</p>
                       <div className="rf-links rf-links-end">
                         <button type="button" className="rf-link" onClick={() => { setManual(true); setText(''); setStep('edit'); }}>{t('manual', lang)}</button>
