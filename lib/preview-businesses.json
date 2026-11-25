@@ -1,0 +1,214 @@
+[
+  {
+    "slug": "3m-car-care-studio-review",
+    "name": "3M Car Care Studio - Car Detailing, Ceramic Coating and PPF, Kothrud",
+    "short_name": "3M Car Care Studio",
+    "category": "Auto restoration service",
+    "location": "Blk No 2, of Starbucks Cafe, Fountain Head Soc, 21 & 224, Kothrud, Sangam Shree Society, Kothrud, Pune, Maharashtra 4110",
+    "logo_url": "",
+    "primary_color": "#1F7A3A",
+    "accent_color": "#C9A227",
+    "google_review_url": "https://g.page/r/Cae78TSn1FXvEAE/review",
+    "seo_keywords": "best car detailing in Kothrud, best ceramic coating in Pune, car washing centre Kothrud, car scratch removal Kothrud, car detailing Kothrud",
+    "keywords": [
+      {
+        "id": "best-car-detailing-in-kothrud",
+        "kind": "primary",
+        "text": "best car detailing in Kothrud",
+        "when": [],
+        "enabled": true
+      },
+      {
+        "id": "best-ceramic-coating-in-pune",
+        "kind": "secondary",
+        "text": "best ceramic coating in Pune",
+        "when": [],
+        "enabled": true
+      },
+      {
+        "id": "car-washing-centre-kothrud",
+        "kind": "secondary",
+        "text": "car washing centre Kothrud",
+        "when": [],
+        "enabled": true
+      },
+      {
+        "id": "car-scratch-removal-kothrud",
+        "kind": "secondary",
+        "text": "car scratch removal Kothrud",
+        "when": [],
+        "enabled": true
+      },
+      {
+        "id": "car-detailing-kothrud",
+        "kind": "primary",
+        "text": "car detailing Kothrud",
+        "when": [],
+        "enabled": true
+      }
+    ],
+    "greeting": {
+      "en": "Hi! Thank you for visiting 3M Car Care Studio. I will help you put your feedback into words – it takes less than a minute.",
+      "hi": "नमस्ते! 3M Car Care Studio पर आने के लिए धन्यवाद. आपका फीडबैक शब्दों में लिखने में मैं मदद करूँगा – एक मिनट से भी कम लगेगा.",
+      "mr": "नमस्कार! 3M Car Care Studio ला भेट दिल्याबद्दल धन्यवाद. तुमचा अभिप्राय शब्दांत मांडायला मी मदत करेन – एका मिनिटापेक्षा कमी वेळ लागेल."
+    },
+    "questions": [
+      {
+        "id": "liked",
+        "type": "multi",
+        "prompt": {
+          "en": "What did you like most?",
+          "hi": "आपको सबसे ज़्यादा क्या पसंद आया?",
+          "mr": "तुम्हाला सर्वात जास्त काय आवडलं?"
+        },
+        "options": [
+          {
+            "id": "quality",
+            "label": {
+              "en": "Product quality",
+              "hi": "प्रोडक्ट की क्वालिटी",
+              "mr": "उत्पादनाचा दर्जा"
+            }
+          },
+          {
+            "id": "staff",
+            "label": {
+              "en": "Staff behaviour",
+              "hi": "स्टाफ का व्यवहार",
+              "mr": "स्टाफचं वागणं"
+            }
+          },
+          {
+            "id": "service",
+            "label": {
+              "en": "Customer service",
+              "hi": "कस्टमर सर्विस",
+              "mr": "ग्राहक सेवा"
+            }
+          },
+          {
+            "id": "ambience",
+            "label": {
+              "en": "Ambience",
+              "hi": "माहौल",
+              "mr": "वातावरण"
+            }
+          },
+          {
+            "id": "cleanliness",
+            "label": {
+              "en": "Cleanliness",
+              "hi": "साफ़-सफ़ाई",
+              "mr": "स्वच्छता"
+            }
+          },
+          {
+            "id": "delivery",
+            "label": {
+              "en": "Delivery",
+              "hi": "डिलीवरी",
+              "mr": "डिलिव्हरी"
+            }
+          },
+          {
+            "id": "pricing",
+            "label": {
+              "en": "Pricing",
+              "hi": "कीमत",
+              "mr": "किंमत"
+            }
+          }
+        ],
+        "showFor": "liked",
+        "summary": {
+          "en": "What I liked",
+          "hi": "मुझे जो पसंद आया",
+          "mr": "मला आवडलेल्या गोष्टी"
+        },
+        "optional": false
+      },
+      {
+        "id": "improve",
+        "type": "multi",
+        "prompt": {
+          "en": "What could we do better?",
+          "hi": "हम क्या बेहतर कर सकते थे?",
+          "mr": "आम्ही काय अधिक चांगलं करू शकलो असतो?"
+        },
+        "options": [
+          {
+            "id": "quality",
+            "label": {
+              "en": "Product quality",
+              "hi": "प्रोडक्ट की क्वालिटी",
+              "mr": "उत्पादनाचा दर्जा"
+            }
+          },
+          {
+            "id": "staff",
+            "label": {
+              "en": "Staff behaviour",
+              "hi": "स्टाफ का व्यवहार",
+              "mr": "स्टाफचं वागणं"
+            }
+          },
+          {
+            "id": "service",
+            "label": {
+              "en": "Customer service",
+              "hi": "कस्टमर सर्विस",
+              "mr": "ग्राहक सेवा"
+            }
+          },
+          {
+            "id": "ambience",
+            "label": {
+              "en": "Ambience",
+              "hi": "माहौल",
+              "mr": "वातावरण"
+            }
+          },
+          {
+            "id": "cleanliness",
+            "label": {
+              "en": "Cleanliness",
+              "hi": "साफ़-सफ़ाई",
+              "mr": "स्वच्छता"
+            }
+          },
+          {
+            "id": "delivery",
+            "label": {
+              "en": "Delivery",
+              "hi": "डिलीवरी",
+              "mr": "डिलिव्हरी"
+            }
+          },
+          {
+            "id": "pricing",
+            "label": {
+              "en": "Pricing",
+              "hi": "कीमत",
+              "mr": "किंमत"
+            }
+          }
+        ],
+        "showFor": "improve",
+        "summary": {
+          "en": "What could be better",
+          "hi": "जिसमें सुधार हो सकता है",
+          "mr": "सुधारणा हवी अशा गोष्टी"
+        },
+        "optional": true
+      }
+    ],
+    "settings": {
+      "facts": [],
+      "topics": true,
+      "language": "",
+      "whatsapp": "918291054496",
+      "suggestions": 3,
+      "instagram_url": "https://www.instagram.com/3mcarcare.kothrud/"
+    }
+  }
+]
