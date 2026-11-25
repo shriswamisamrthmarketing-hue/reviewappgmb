@@ -43,7 +43,13 @@ export async function POST(req) {
 
   /* ---------- business owner ---------- */
   if (!ownerAuthConfigured())
-    return NextResponse.json({ error: 'Login is not configured yet. Ask the administrator to set SESSION_SECRET.' }, { status: 500 });
+  {
+    // Diagnostic: says only whether SESSION_SECRET exists and how many characters it has – never the value.
+    const raw = process.env.SESSION_SECRET;
+    const why = raw === undefined ? 'SESSION_SECRET is not set on this deployment.'
+      : `SESSION_SECRET is set but only ${raw.length} characters long (needs 16 or more).`;
+    return NextResponse.json({ error: 'Login is not configured yet. ' + why }, { status: 500 });
+  }
   let owner = null;
   try {
     owner = await getOwnerAuth(id.includes('@') ? { email: id } : { username: id });
