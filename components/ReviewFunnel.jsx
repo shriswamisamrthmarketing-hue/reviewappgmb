@@ -15,6 +15,9 @@ const UI_LANGS = [
   ['hi', 'हिंदी'],
   ['mr', 'मराठी'],
 ];
+// Preschools / daycares / schools: parents can choose how long the suggestions are (other clients: unchanged).
+const REVIEW_LENS = ['short', 'medium', 'detailed', 'long'];
+const isParentBiz = (b) => /pre-?\s?school|play\s?school|play\s?group|day\s?care|cr[eè]che|kindergarten|montessori|nursery school|\bschool\b/i.test(`${b?.category || ''} ${b?.name || ''}`);
 const REVIEW_LANGS = [
   ['en', 'English'],
   ['hi', 'हिंदी'],
@@ -64,6 +67,12 @@ const T = {
   required: { en: 'Please pick at least one option above.', hi: 'ऊपर कम से कम एक विकल्प चुनें.', mr: 'वर किमान एक पर्याय निवडा.' },
   ownWords: { en: 'Anything to add in your own words?', hi: 'अपने शब्दों में कुछ जोड़ना चाहेंगे?', mr: 'तुमच्या शब्दांत काही जोडायचं आहे?' },
   ownPh: { en: 'e.g. what you liked most (optional)', hi: 'जैसे, आपको सबसे अच्छा क्या लगा (वैकल्पिक)', mr: 'उदा. तुम्हाला सर्वात जास्त काय आवडलं (ऐच्छिक)' },
+  reviewLen: { en: 'Review length', hi: 'रिव्यू की लंबाई', mr: 'रिव्ह्यूची लांबी' },
+  lens: {
+    en: { short: 'Short', medium: 'Medium', detailed: 'Detailed', long: 'Long' },
+    hi: { short: 'छोटा', medium: 'मध्यम', detailed: 'विस्तार से', long: 'लंबा अनुभव' },
+    mr: { short: 'छोटा', medium: 'मध्यम', detailed: 'सविस्तर', long: 'मोठा अनुभव' },
+  },
   reviewLang: { en: 'Review language', hi: 'रिव्यू की भाषा', mr: 'रिव्ह्यूची भाषा' },
   tone: { en: 'Writing style', hi: 'लिखने का अंदाज़', mr: 'लेखनशैली' },
   styles: {
@@ -215,6 +224,8 @@ export default function ReviewFunnel({ business, preview = false, source = 'link
   const [hover, setHover] = useState(0);
   const [burst, setBurst] = useState(0);
   const [reviewLang, setReviewLang] = useState('en');
+  const [reviewLen, setReviewLen] = useState('medium');
+  const parentBiz = isParentBiz(business);
   const [details, setDetails] = useState(''); // customer's own words (optional)
   const [keyword, setKeyword] = useState(null);
   const [noKw, setNoKw] = useState(false); // customer chose "No search phrase"
@@ -286,6 +297,7 @@ export default function ReviewFunnel({ business, preview = false, source = 'link
       answers: {}, // no questions / topics screen
       details: overrides.details ?? details, // the customer's own words (optional)
       language: overrides.language ?? reviewLang,
+      ...(parentBiz ? { length: overrides.length ?? reviewLen } : {}),
       style: 'friendly', // each card gets its own natural style on the server
       keyword: overrides.keyword !== undefined ? overrides.keyword : keyword,
       noKeyword: overrides.noKw ?? noKw,
@@ -502,7 +514,7 @@ export default function ReviewFunnel({ business, preview = false, source = 'link
                           {drafts.map((d) => {
                             const inner = (
                               <>
-                                <span className="rf-draft-text">{d}</span>
+                                <span className="rf-draft-text" style={{ whiteSpace: 'pre-line' }}>{d}</span>
                                 <span className="rf-scard-go">{t(business.google_review_url ? 'tapCopyGo' : 'tapCopyOnly', lang)}</span>
                               </>
                             );
@@ -536,6 +548,13 @@ export default function ReviewFunnel({ business, preview = false, source = 'link
                           <button key={c} type="button" className={reviewLang === c ? 'on' : ''} disabled={busy} onClick={() => { if (c === reviewLang) return; setReviewLang(c); fetchDrafts({ overrides: { language: c } }); }}>{l}</button>
                         ))}
                       </div>
+                      {parentBiz && (
+                        <div className="rf-seg rf-seg-full rf-seg-lang" role="group" aria-label={t('reviewLen', lang)}>
+                          {REVIEW_LENS.map((c) => (
+                            <button key={c} type="button" className={reviewLen === c ? 'on' : ''} disabled={busy} onClick={() => { if (c === reviewLen) return; setReviewLen(c); fetchDrafts({ overrides: { length: c } }); }}>{(T.lens[lang] || T.lens.en)[c]}</button>
+                          ))}
+                        </div>
+                      )}
                       {/* Search-phrase chips removed (they confused customers). Every card automatically uses a
                           different saved SEO keyword ("A different one per review"); nothing to pick. */}
                       <p className="rf-sub rf-sugg-note">{t('draftsNote', lang)}</p>
